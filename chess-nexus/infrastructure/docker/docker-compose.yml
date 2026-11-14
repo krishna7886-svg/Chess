@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  nexus-postgres:
+    image: postgres:16-alpine
+    container_name: chess-nexus-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: chess_nexus
+      POSTGRES_USER: nexus_admin
+      POSTGRES_PASSWORD: NexusPostgresSecurePass2026!
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nexus_admin -d chess_nexus"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nexus-redis:
+    image: redis:7-alpine
+    container_name: chess-nexus-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nexus-backend:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile.backend
+    container_name: chess-nexus-backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      NEXUS_ENV: production
+      DATABASE_URL: postgresql+asyncpg://nexus_admin:NexusPostgresSecurePass2026!@nexus-postgres:5432/chess_nexus
+      REDIS_URL: redis://nexus-redis:6379/0
+      JWT_SECRET: NexusProductionSecretKeyMustBe32BytesLength2026!
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    depends_on:
+      nexus-postgres:
+        condition: service_healthy
+      nexus-redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
+

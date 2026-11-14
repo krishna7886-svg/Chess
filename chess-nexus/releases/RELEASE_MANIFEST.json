@@ -1,0 +1,64 @@
+{
+  "product_name": "CHESS NEXUS",
+  "version": "1.0.0",
+  "build_number": 100,
+  "release_channel": "Production",
+  "timestamp": "2026-11-14T20:00:00Z",
+  "target_platforms": {
+    "android": {
+      "min_sdk": 24,
+      "target_sdk": 34,
+      "package_name": "com.chessnexus.app",
+      "artifacts": [
+        {
+          "name": "chess-nexus-v1.0.0-arm64-v8a.apk",
+          "abi": "arm64-v8a",
+          "type": "Standalone Production APK",
+          "intended_audience": "Modern 64-bit Android Devices",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "chess-nexus-v1.0.0-armeabi-v7a.apk",
+          "abi": "armeabi-v7a",
+          "type": "Legacy 32-bit Android APK",
+          "intended_audience": "Legacy Android Devices",
+          "sha256": "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"
+        },
+        {
+          "name": "chess-nexus-v1.0.0.aab",
+          "type": "Google Play App Bundle (AAB)",
+          "intended_audience": "Google Play Console Production Track",
+          "sha256": "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4"
+        }
+      ]
+    },
+    "ios": {
+      "deployment_target": "14.0",
+      "bundle_identifier": "com.chessnexus.app",
+      "artifacts": [
+        {
+          "name": "chess-nexus-v1.0.0.ipa",
+          "type": "Apple Signed iOS IPA",
+          "intended_audience": "Apple TestFlight & App Store Production",
+          "sha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a"
+        }
+      ]
+    }
+  },
+  "backend": {
+    "docker_image": "chessnexus/backend:1.0.0",
+    "fastapi_version": "0.111.0",
+    "python_version": "3.11-slim",
+    "postgresql_version": "16",
+    "redis_version": "7"
+  },
+  "engine": {
+    "uci_engine": "Stockfish 16.1",
+    "license": "GNU General Public License v3 (GPLv3)"
+  },
+  "ai_coach": {
+    "provider": "Google Gemini 1.5 Pro / Flash",
+    "supported_languages": ["English", "Telugu (తెలుగు)"]
+  }
+}
+
