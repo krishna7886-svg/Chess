@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:chess_nexus/app/theme/app_theme.dart';
 import 'package:chess_nexus/features/chess_engine/domain/models/chess_piece.dart';
 import 'package:chess_nexus/features/gameplay/presentation/widgets/nexus_board.dart';
@@ -140,9 +139,9 @@ class _TacticsAcademyScreenState extends State<TacticsAcademyScreen> {
                         ),
                       ),
                       const SizedBox(width: 6),
-                      const Text(
-                        "⚪ White to move · Mate in 1",
-                        style: TextStyle(
+                      Text(
+                        _isSolved ? "✅ Puzzle Solved!" : "⚪ White to move · Mate in 1",
+                        style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                           color: NexusColors.ivory,

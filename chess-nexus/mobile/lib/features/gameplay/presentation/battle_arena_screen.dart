@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:chess_nexus/app/theme/app_theme.dart';
 import 'package:chess_nexus/features/chess_engine/domain/models/chess_piece.dart';
 import 'package:chess_nexus/features/gameplay/presentation/widgets/nexus_board.dart';
-import 'package:chess_nexus/features/gameplay/presentation/widgets/dual_chess_clock.dart';
 import 'package:chess_nexus/features/gameplay/presentation/widgets/move_tape_ribbon.dart';
 import 'package:chess_nexus/features/gameplay/presentation/widgets/promotion_dialog.dart';
 import 'package:chess_nexus/features/analysis/presentation/widgets/eval_gauge.dart';
@@ -29,7 +28,6 @@ class _BattleArenaScreenState extends State<BattleArenaScreen> {
 
   int _whiteTimeSeconds = 258; // 04:18
   int _blackTimeSeconds = 232; // 03:52
-  bool _isClockRunning = true;
 
   final List<String> _movesSan = ["e4", "e5", "Nf3", "Nc6", "Bb5", "a6"];
   double _evalCentipawns = 60.0; // +0.6 White

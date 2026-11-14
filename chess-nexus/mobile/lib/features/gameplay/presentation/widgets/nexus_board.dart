@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:chess_nexus/app/theme/app_theme.dart';
 import 'package:chess_nexus/features/chess_engine/domain/models/chess_piece.dart';
-import 'package:chess_nexus/core/services/audio_service.dart';
 import 'package:chess_nexus/core/services/haptics_service.dart';
 
 class NexusBoardWidget extends StatefulWidget {
@@ -33,8 +32,6 @@ class NexusBoardWidget extends StatefulWidget {
 }
 
 class _NexusBoardWidgetState extends State<NexusBoardWidget> {
-  String? _draggedSquare;
-
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
@@ -89,7 +86,6 @@ class _NexusBoardWidgetState extends State<NexusBoardWidget> {
                           if (fromSquare != square) {
                             widget.onMoveExecuted?.call(fromSquare, square);
                           }
-                          setState(() => _draggedSquare = null);
                         },
                         builder: (context, candidateData, rejectedData) {
                           return GestureDetector(
@@ -120,12 +116,8 @@ class _NexusBoardWidgetState extends State<NexusBoardWidget> {
                                         child: Image.asset(piece.assetPath),
                                       ),
                                       onDragStarted: () {
-                                        setState(() => _draggedSquare = square);
                                         widget.onSquareSelected?.call(square);
                                         HapticsService.vibrateOnMove();
-                                      },
-                                      onDraggableCanceled: (_, __) {
-                                        setState(() => _draggedSquare = null);
                                       },
                                       child: Semantics(
                                         label: "${piece.color.name} ${piece.type.name} on $square",

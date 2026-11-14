@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:chess_nexus/app/theme/app_theme.dart';
 import 'package:chess_nexus/features/chess_engine/domain/models/chess_piece.dart';
 import 'package:chess_nexus/features/gameplay/presentation/widgets/nexus_board.dart';
-import 'package:chess_nexus/features/analysis/presentation/widgets/eval_gauge.dart';
 
 class AnalysisStudioScreen extends StatefulWidget {
   const AnalysisStudioScreen({super.key});
@@ -96,9 +95,9 @@ class _AnalysisStudioScreenState extends State<AnalysisStudioScreen> {
                           borderRadius: BorderRadius.circular(6),
                           border: Border.all(color: NexusColors.mintAccent),
                         ),
-                        child: const Text(
-                          "+3.4 White",
-                          style: TextStyle(
+                        child: Text(
+                          "+${(_currentEvaluation / 100).toStringAsFixed(1)} White",
+                          style: const TextStyle(
                             fontFamily: 'monospace',
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
