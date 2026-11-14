@@ -14,42 +14,42 @@ dependencies:
     sdk: flutter
 
   # State Management & Routing
-  flutter_riverpod: ^2.5.1
-  go_router: ^14.0.1
+  flutter_riverpod: any
+  go_router: any
 
   # Local Persistence & Secure Storage
-  drift: ^2.16.0
-  sqlite3_flutter_libs: ^0.5.20
-  flutter_secure_storage: ^9.0.0
-  shared_preferences: ^2.2.3
+  drift: any
+  sqlite3_flutter_libs: any
+  flutter_secure_storage: any
+  shared_preferences: any
 
   # Networking & Real-Time
-  dio: ^5.4.3+1
-  web_socket_channel: ^2.4.5
-  jwt_decode: ^0.3.1
+  dio: any
+  web_socket_channel: any
+  jwt_decode: any
 
   # Chess Logic & Stockfish
-  chess: ^0.8.1
+  chess: any
 
   # Audio & Haptics
-  audioplayers: ^6.0.0
-  flutter_vibrate: ^1.3.0
+  audioplayers: any
+  flutter_vibrate: any
 
   # Speech & Accessibility
-  speech_to_text: ^6.6.1
-  flutter_tts: ^4.0.2
+  speech_to_text: any
+  flutter_tts: any
 
   # UI & Design Tokens
-  google_fonts: ^6.2.1
-  flutter_svg: ^2.0.10+1
+  google_fonts: any
+  flutter_svg: any
   intl: any
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.2
-  drift_dev: ^2.16.0
-  build_runner: ^2.4.9
+  flutter_lints: any
+  drift_dev: any
+  build_runner: any
 
 flutter:
   uses-material-design: true
@@ -57,4 +57,3 @@ flutter:
   assets:
     - assets/pieces/classic/
     - assets/sounds/
-

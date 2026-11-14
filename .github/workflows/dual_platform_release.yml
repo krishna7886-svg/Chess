@@ -184,7 +184,7 @@ jobs:
   publish-release:
     name: Publish Release Packages to GitHub Releases
     needs: [build-android, build-ios]
-    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    if: always() && !cancelled() && (needs.build-android.result == 'success' || needs.build-ios.result == 'success')
     runs-on: ubuntu-latest
 
     steps:
@@ -193,24 +193,28 @@ jobs:
 
       - name: Download Android Debug APK
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: chess-nexus-debug-apk
           path: release-assets/
 
       - name: Download Android Release APK
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: chess-nexus-release-apk
           path: release-assets/
 
       - name: Download Android Release AAB
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: chess-nexus-release-aab
           path: release-assets/
 
       - name: Download iOS Distribution Artifact
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: chess-nexus-ios-distribution
           path: release-assets/
@@ -244,4 +248,3 @@ jobs:
           files: release-assets/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
