@@ -40,6 +40,10 @@ jobs:
           flutter --version
           flutter doctor -v
 
+      - name: Precache Flutter Android Artifacts
+        working-directory: chess-nexus/mobile
+        run: flutter precache --android
+
       - name: Resolve Mobile Dependencies
         working-directory: chess-nexus/mobile
         run: flutter pub get
