@@ -107,3 +107,4 @@ The macOS runner automatically detects whether Apple Developer credentials are c
 - [x] 25/25 automated unit and user journey tests passed.
 - [x] Stockfish 16.1 GPLv3 attribution dialog wired into settings.
 - [x] Telugu and English bilingual voice parser integrated into match session.
+

@@ -12,7 +12,7 @@ class ChessNexusApp extends ConsumerWidget {
       title: 'CHESS NEXUS',
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.dark,
-      darkTheme: AppTheme.darkTheme,
+      darkTheme: NexusTheme.darkTheme,
       routerConfig: appRouter,
     );
   }

@@ -124,6 +124,7 @@ jobs:
         working-directory: chess-nexus/mobile
         run: |
           flutter pub get
+          flutter build ios --config-only --no-codesign
           cd ios
           pod install
 

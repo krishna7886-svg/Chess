@@ -60,7 +60,7 @@ class NexusTheme {
         type: BottomNavigationBarType.fixed,
         elevation: 8,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: NexusColors.deepForest,
         elevation: 4,
         shape: RoundedRectangleBorder(
@@ -97,4 +97,6 @@ class NexusTheme {
     );
   }
 }
+
+typedef AppTheme = NexusTheme;
 

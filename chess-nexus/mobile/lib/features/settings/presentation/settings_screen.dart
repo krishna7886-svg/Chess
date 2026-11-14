@@ -140,7 +140,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: const Text('Stockfish GPLv3 Compliance & Source', style: TextStyle(color: NexusColors.ivory, fontSize: 13, fontWeight: FontWeight.w600)),
               subtitle: const Text('Open-source UCI engine. Licensed under GNU GPLv3.', style: TextStyle(color: NexusColors.secondaryText, fontSize: 11)),
               trailing: const Icon(Icons.open_in_new, color: NexusColors.secondaryText, size: 16),
-              onChanged: null,
               onTap: () => _showLicenseDialog(context),
             ),
           ]),

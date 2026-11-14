@@ -8,6 +8,61 @@ class ChessPiece {
 
   const ChessPiece({required this.color, required this.type});
 
+  static ChessPiece fromFenSymbol(String symbol) {
+    final isWhite = symbol == symbol.toUpperCase();
+    final color = isWhite ? PieceColor.white : PieceColor.black;
+    final lower = symbol.toLowerCase();
+    PieceType type;
+    switch (lower) {
+      case 'p':
+        type = PieceType.pawn;
+        break;
+      case 'n':
+        type = PieceType.knight;
+        break;
+      case 'b':
+        type = PieceType.bishop;
+        break;
+      case 'r':
+        type = PieceType.rook;
+        break;
+      case 'q':
+        type = PieceType.queen;
+        break;
+      case 'k':
+        type = PieceType.king;
+        break;
+      default:
+        type = PieceType.pawn;
+    }
+    return ChessPiece(color: color, type: type);
+  }
+
+  String toFenSymbol() {
+    String letter;
+    switch (type) {
+      case PieceType.pawn:
+        letter = 'p';
+        break;
+      case PieceType.knight:
+        letter = 'n';
+        break;
+      case PieceType.bishop:
+        letter = 'b';
+        break;
+      case PieceType.rook:
+        letter = 'r';
+        break;
+      case PieceType.queen:
+        letter = 'q';
+        break;
+      case PieceType.king:
+        letter = 'k';
+        break;
+    }
+    return color == PieceColor.white ? letter.toUpperCase() : letter;
+  }
+
   String get assetPath {
     final prefix = type.name[0].toUpperCase() + type.name.substring(1);
     final suffix = color == PieceColor.white ? 'W' : 'B';
@@ -48,4 +103,3 @@ class ChessPiece {
     }
   }
 }
-
