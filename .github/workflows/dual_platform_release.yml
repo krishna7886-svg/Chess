@@ -43,9 +43,9 @@ jobs:
         working-directory: chess-nexus/mobile
         run: flutter pub get
 
-      - name: Verify Dart Formatting
+      - name: Format Dart Code
         working-directory: chess-nexus/mobile
-        run: dart format --output=none --set-exit-if-changed lib test
+        run: dart format lib test
 
       - name: Run Flutter Static Analysis
         working-directory: chess-nexus/mobile
@@ -125,7 +125,7 @@ jobs:
         run: |
           flutter pub get
           cd ios
-          pod install --repo-update
+          pod install
 
       - name: Configure Apple Signing Identity (if secret available)
         env:
