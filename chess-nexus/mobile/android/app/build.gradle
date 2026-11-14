@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.chessnexus.app"
-    compileSdk flutter.compileSdkVersion ?: 35
+    compileSdk 35
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -42,8 +42,8 @@ android {
 
     defaultConfig {
         applicationId "com.chessnexus.app"
-        minSdk flutter.minSdkVersion ?: 24
-        targetSdk flutter.targetSdkVersion ?: 35
+        minSdk 24
+        targetSdk 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
 
