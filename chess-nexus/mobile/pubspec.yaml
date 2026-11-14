@@ -33,7 +33,6 @@ dependencies:
 
   # Audio & Haptics
   audioplayers: any
-  flutter_vibrate: any
 
   # Speech & Accessibility
   speech_to_text: any
