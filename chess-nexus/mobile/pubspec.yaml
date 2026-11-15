@@ -34,9 +34,6 @@ dependencies:
   # Audio & Haptics
   audioplayers: any
 
-  # Speech & Accessibility
-  speech_to_text: any
-  flutter_tts: any
 
   # UI & Design Tokens
   google_fonts: any
