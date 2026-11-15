@@ -54,7 +54,10 @@ class VoiceChessParser {
 
     // Normalize leading polite or filler words ("please", "move", "play")
     text = text.replaceAll(RegExp(r'^\s*(please|play)\s+', caseSensitive: false), '');
-    text = text.replaceAll(RegExp(r'^\s*move\s+(pawn|knight|bishop|rook|queen|king|[a-h][1-8])', caseSensitive: false), r'$1');
+    text = text.replaceAllMapped(
+      RegExp(r'^\s*move\s+(pawn|knight|bishop|rook|queen|king|[a-h][1-8])', caseSensitive: false),
+      (match) => match.group(1)!,
+    );
 
     // Normalize phonetics and common speech recognizer quirks
     final replacements = {
@@ -97,7 +100,15 @@ class VoiceChessParser {
     };
 
     for (final entry in replacements.entries) {
-      text = text.replaceAll(RegExp(entry.key, caseSensitive: false), entry.value);
+      if (entry.value.contains(r'$2')) {
+        final prefix = entry.value.replaceAll(r'$2', '');
+        text = text.replaceAllMapped(
+          RegExp(entry.key, caseSensitive: false),
+          (match) => '$prefix${match.group(2) ?? ""}',
+        );
+      } else {
+        text = text.replaceAll(RegExp(entry.key, caseSensitive: false), entry.value);
+      }
     }
 
     // Collapse multiple spaces
