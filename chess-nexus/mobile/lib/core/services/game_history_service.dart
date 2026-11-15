@@ -79,3 +79,4 @@ class GameHistoryService {
     await prefs.remove(_storageKey);
   }
 }
+

@@ -399,3 +399,4 @@ class VoiceChessParser {
     return '$piece from $from to $to';
   }
 }
+
