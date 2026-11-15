@@ -73,13 +73,13 @@ class VoiceChessParser {
 
       // Files & coordinates phonetics
       r'\b(see|sea)\s*(four|4)\b': 'c4',
-      r'\b(see|sea)\s*([1-8])\b': 'c$2',
+      r'\b(see|sea)\s*([1-8])\b': r'c$2',
       r'\b(be|bee|before)\s*(four|4)\b': 'b4',
-      r'\b(be|bee)\s*([1-8])\b': 'b$2',
-      r'\b(the|dee)\s*([1-8])\b': 'd$2',
+      r'\b(be|bee)\s*([1-8])\b': r'b$2',
+      r'\b(the|dee)\s*([1-8])\b': r'd$2',
       r'\b(eat|e)\s*(four|4)\b': 'e4',
       r'\b(eff|f)\s*(three|3)\b': 'f3',
-      r'\b(age|aitch)\s*([1-8])\b': 'h$2',
+      r'\b(age|aitch)\s*([1-8])\b': r'h$2',
 
       // Number words to digits
       r'\bone\b': '1',

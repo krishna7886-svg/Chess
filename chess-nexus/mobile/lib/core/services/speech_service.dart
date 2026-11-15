@@ -61,7 +61,7 @@ class SpeechService {
           _setState(VoiceInteractionState.error);
         },
       );
-      _hasPermission = _speech.hasPermission;
+      _hasPermission = await _speech.hasPermission;
       return _isInitialized;
     } catch (e) {
       debugPrint('SpeechService initialize exception: $e');
@@ -104,9 +104,11 @@ class SpeechService {
         },
         listenFor: const Duration(seconds: 15),
         pauseFor: const Duration(seconds: 3),
-        partialResults: true,
-        cancelOnError: true,
-        listenMode: stt.ListenMode.confirmation,
+        listenOptions: stt.SpeechListenOptions(
+          partialResults: true,
+          cancelOnError: true,
+          listenMode: stt.ListenMode.confirmation,
+        ),
       );
     } catch (e) {
       debugPrint('SpeechService listen exception: $e');
