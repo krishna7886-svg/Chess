@@ -52,6 +52,10 @@ class VoiceChessParser {
     // Remove punctuation
     text = text.replaceAll(RegExp(r'[.,?!;:_\-]'), ' ');
 
+    // Normalize leading polite or filler words ("please", "move", "play")
+    text = text.replaceAll(RegExp(r'^\s*(please|play)\s+', caseSensitive: false), '');
+    text = text.replaceAll(RegExp(r'^\s*move\s+(pawn|knight|bishop|rook|queen|king|[a-h][1-8])', caseSensitive: false), r'$1');
+
     // Normalize phonetics and common speech recognizer quirks
     final replacements = {
       // Castling phonetics
@@ -115,7 +119,7 @@ class VoiceChessParser {
 
     // 1. Check for system voice commands first
     if (_matchesPattern(normalized, [
-      'undo', 'take back', 'takeback', 'go back', 'revert move', 'undo move'
+      'undo', 'take back', 'takeback', 'takes back', 'go back', 'revert move', 'undo move'
     ])) {
       return VoiceParseResult(
         type: VoiceActionType.undo,
@@ -316,7 +320,7 @@ class VoiceChessParser {
       List<dynamic> candidates = legalMoves.where((m) => m['to'] == targetSquare).toList();
 
       if (targetPieceType != null) {
-        candidates = candidates.where((m) => m['piece'] == targetPieceType).toList();
+        candidates = candidates.where((m) => _matchesPieceType(m, targetPieceType!)).toList();
       }
 
       // Check if user specified a source file/rank (e.g. "Knight from b1 to d2")
@@ -372,6 +376,41 @@ class VoiceChessParser {
       }
     }
     return false;
+  }
+
+  static bool _matchesPieceType(dynamic move, String pieceCode) {
+    final String san = (move['san'] ?? '').toString();
+    final p = move['piece'];
+    final String pStr = p != null ? (p is String ? p : (p.toString())).toLowerCase() : '';
+
+    switch (pieceCode.toLowerCase()) {
+      case 'p':
+        if (RegExp(r'^[a-h]').hasMatch(san)) return true;
+        if (pStr.contains('pawn') || pStr == 'p' || pStr.endsWith('.p')) return true;
+        return false;
+      case 'n':
+        if (san.startsWith('N')) return true;
+        if (pStr.contains('knight') || pStr == 'n' || pStr.endsWith('.n')) return true;
+        return false;
+      case 'b':
+        if (san.startsWith('B')) return true;
+        if (pStr.contains('bishop') || pStr == 'b' || pStr.endsWith('.b')) return true;
+        return false;
+      case 'r':
+        if (san.startsWith('R')) return true;
+        if (pStr.contains('rook') || pStr == 'r' || pStr.endsWith('.r')) return true;
+        return false;
+      case 'q':
+        if (san.startsWith('Q')) return true;
+        if (pStr.contains('queen') || pStr == 'q' || pStr.endsWith('.q')) return true;
+        return false;
+      case 'k':
+        if (san.startsWith('K') || san.startsWith('O-')) return true;
+        if (pStr.contains('king') || pStr == 'k' || pStr.endsWith('.k')) return true;
+        return false;
+      default:
+        return false;
+    }
   }
 
   static String _pieceName(String type) {
