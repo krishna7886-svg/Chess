@@ -34,6 +34,9 @@ dependencies:
   # Audio & Haptics
   audioplayers: any
 
+  # Voice-First Chess Speech Recognition
+  speech_to_text: ^6.6.1
+
 
   # UI & Design Tokens
   google_fonts: any

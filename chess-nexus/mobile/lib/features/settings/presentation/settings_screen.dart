@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../app/theme/app_theme.dart';
+import '../../../core/services/audio_service.dart';
+import '../../../core/services/haptics_service.dart';
+import '../../../core/services/speech_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -9,161 +12,85 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  final AudioService _audio = AudioService();
+  final SpeechService _speech = SpeechService();
+
   bool _soundEnabled = true;
   bool _hapticsEnabled = true;
-  bool _voiceChessEnabled = true;
-  String _language = 'English (US)';
-  String _boardStyle = 'Nexus Emerald / Ivory';
-  String _pieceSet = 'Preserved Classic High-Res';
-  int _engineDepth = 18;
-  bool _biometrics = true;
+  String _boardTheme = "Obsidian & Emerald";
+
+  @override
+  void initState() {
+    super.initState();
+    _soundEnabled = _audio.isSoundEnabled;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: NexusColors.obsidian,
       appBar: AppBar(
-        backgroundColor: NexusColors.deepForest,
+        backgroundColor: NexusColors.obsidian,
         elevation: 0,
         title: const Text(
-          'NEXUS PREFERENCES',
+          'Settings',
           style: TextStyle(
-            color: NexusColors.champagne,
-            letterSpacing: 2.0,
-            fontSize: 16,
+            color: NexusColors.ivory,
             fontWeight: FontWeight.bold,
+            letterSpacing: 1.0,
           ),
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         children: [
-          // Section: Appearance & Board
-          _buildSectionHeader('BOARD & APPEARANCE'),
-          _buildCard([
-            _buildDropdownTile(
-              title: 'Board Palette Theme',
-              subtitle: 'Active: $_boardStyle',
-              icon: Icons.palette_outlined,
-              value: _boardStyle,
-              items: ['Nexus Emerald / Ivory', 'Obsidian Minimalist', 'Champagne Luxury', 'FIDE Tournament Green'],
-              onChanged: (val) => setState(() => _boardStyle = val!),
-            ),
-            const Divider(color: NexusColors.emerald, height: 1),
-            _buildDropdownTile(
-              title: 'Chess Piece Vector Set',
-              subtitle: 'Active: $_pieceSet',
-              icon: Icons.extension_outlined,
-              value: _pieceSet,
-              items: ['Preserved Classic High-Res', 'Neo-Minimalist SVGs', 'Vintage Woodcraft'],
-              onChanged: (val) => setState(() => _pieceSet = val!),
-            ),
-          ]),
+          // 1. Voice Recognition Section
+          _buildSectionHeader('VOICE CONTROL'),
+          _buildVoiceCard(),
+
           const SizedBox(height: 20),
 
-          // Section: Audio & Haptics
-          _buildSectionHeader('SOUND & SENSORY HAPTICS'),
-          _buildCard([
-            SwitchListTile(
-              activeColor: NexusColors.mintAccent,
-              title: const Text('Move, Check & Capture Sounds', style: TextStyle(color: NexusColors.ivory, fontSize: 13, fontWeight: FontWeight.w600)),
-              subtitle: const Text('Original acoustic sound effects (move, capture, castle, check)', style: TextStyle(color: NexusColors.secondaryText, fontSize: 11)),
-              secondary: const Icon(Icons.volume_up_outlined, color: NexusColors.champagne),
-              value: _soundEnabled,
-              onChanged: (val) => setState(() => _soundEnabled = val),
-            ),
-            const Divider(color: NexusColors.emerald, height: 1),
-            SwitchListTile(
-              activeColor: NexusColors.mintAccent,
-              title: const Text('Physical Haptic Vibrations', style: TextStyle(color: NexusColors.ivory, fontSize: 13, fontWeight: FontWeight.w600)),
-              subtitle: const Text('Tactile response on piece drop and check state', style: TextStyle(color: NexusColors.secondaryText, fontSize: 11)),
-              secondary: const Icon(Icons.vibration, color: NexusColors.champagne),
-              value: _hapticsEnabled,
-              onChanged: (val) => setState(() => _hapticsEnabled = val),
-            ),
-          ]),
+          // 2. Audio & Haptics Section
+          _buildSectionHeader('AUDIO & HAPTICS'),
+          _buildAudioCard(),
+
           const SizedBox(height: 20),
 
-          // Section: Voice Chess & Bilingual Language
-          _buildSectionHeader('VOICE CHESS & LOCALIZATION'),
-          _buildCard([
-            SwitchListTile(
-              activeColor: NexusColors.mintAccent,
-              title: const Text('Voice-Assisted Chess Input', style: TextStyle(color: NexusColors.ivory, fontSize: 13, fontWeight: FontWeight.w600)),
-              subtitle: const Text('Speak moves aloud (e.g. "Knight f3", "రాజును తరలించండి")', style: TextStyle(color: NexusColors.secondaryText, fontSize: 11)),
-              secondary: const Icon(Icons.mic_none_outlined, color: NexusColors.mintAccent),
-              value: _voiceChessEnabled,
-              onChanged: (val) => setState(() => _voiceChessEnabled = val),
-            ),
-            const Divider(color: NexusColors.emerald, height: 1),
-            _buildDropdownTile(
-              title: 'Primary Voice & Commentary Language',
-              subtitle: 'Active: $_language',
-              icon: Icons.language,
-              value: _language,
-              items: ['English (US)', 'English (UK)', 'Telugu (తెలుగు) Phonetic Engine'],
-              onChanged: (val) => setState(() => _language = val!),
-            ),
-          ]),
+          // 3. Board Aesthetics Section
+          _buildSectionHeader('BOARD APPEARANCE'),
+          _buildAppearanceCard(),
+
           const SizedBox(height: 20),
 
-          // Section: Engine & Intelligence
-          _buildSectionHeader('STOCKFISH ENGINE & GEMINI AI'),
-          _buildCard([
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Engine Calculation Depth', style: TextStyle(color: NexusColors.ivory, fontSize: 13, fontWeight: FontWeight.w600)),
-                      Text('$_engineDepth plies', style: const TextStyle(color: NexusColors.mintAccent, fontSize: 13, fontWeight: FontWeight.bold, fontFamily: 'RobotoMono')),
-                    ],
+          // 4. Voice Commands Guide Section
+          _buildSectionHeader('SPOKEN COMMANDS GUIDE'),
+          _buildVoiceGuideCard(),
+
+          const SizedBox(height: 24),
+
+          // 5. About
+          Center(
+            child: Column(
+              children: [
+                Text(
+                  'CHESS NEXUS',
+                  style: TextStyle(
+                    color: NexusColors.champagne.withOpacity(0.8),
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
                   ),
-                  Slider(
-                    activeColor: NexusColors.mintAccent,
-                    inactiveColor: NexusColors.emerald,
-                    value: _engineDepth.toDouble(),
-                    min: 8,
-                    max: 26,
-                    divisions: 9,
-                    onChanged: (val) => setState(() => _engineDepth = val.round()),
-                  ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Beyond the Board — Voice-First Chess\nVersion 1.0.0 (Release Build)',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: NexusColors.secondaryText, fontSize: 11),
+                ),
+              ],
             ),
-            const Divider(color: NexusColors.emerald, height: 1),
-            ListTile(
-              leading: const Icon(Icons.verified_outlined, color: NexusColors.champagne),
-              title: const Text('Stockfish GPLv3 Compliance & Source', style: TextStyle(color: NexusColors.ivory, fontSize: 13, fontWeight: FontWeight.w600)),
-              subtitle: const Text('Open-source UCI engine. Licensed under GNU GPLv3.', style: TextStyle(color: NexusColors.secondaryText, fontSize: 11)),
-              trailing: const Icon(Icons.open_in_new, color: NexusColors.secondaryText, size: 16),
-              onTap: () => _showLicenseDialog(context),
-            ),
-          ]),
-          const SizedBox(height: 20),
-
-          // Section: Security & Account
-          _buildSectionHeader('SECURITY & SYSTEM'),
-          _buildCard([
-            SwitchListTile(
-              activeColor: NexusColors.mintAccent,
-              title: const Text('Biometric Authentication Lock', style: TextStyle(color: NexusColors.ivory, fontSize: 13, fontWeight: FontWeight.w600)),
-              subtitle: const Text('Require Fingerprint / Face ID on app launch', style: TextStyle(color: NexusColors.secondaryText, fontSize: 11)),
-              secondary: const Icon(Icons.fingerprint, color: NexusColors.champagne),
-              value: _biometrics,
-              onChanged: (val) => setState(() => _biometrics = val),
-            ),
-            const Divider(color: NexusColors.emerald, height: 1),
-            ListTile(
-              leading: const Icon(Icons.info_outline, color: NexusColors.secondaryText),
-              title: const Text('CHESS NEXUS Platform', style: TextStyle(color: NexusColors.ivory, fontSize: 13, fontWeight: FontWeight.w600)),
-              subtitle: const Text('Version 1.0.0 (Build 100) • Beyond the Board', style: TextStyle(color: NexusColors.secondaryText, fontSize: 11)),
-            ),
-          ]),
-          const SizedBox(height: 32),
+          ),
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -175,73 +102,208 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Text(
         title,
         style: const TextStyle(
-          color: NexusColors.secondaryText,
-          fontSize: 11,
+          color: NexusColors.mintAccent,
+          fontSize: 11.5,
           fontWeight: FontWeight.bold,
-          letterSpacing: 1.5,
+          letterSpacing: 1.2,
         ),
       ),
     );
   }
 
-  Widget _buildCard(List<Widget> children) {
+  Widget _buildVoiceCard() {
+    final hasPerm = _speech.hasPermission;
+
     return Container(
       decoration: BoxDecoration(
         color: NexusColors.deepForest,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: NexusColors.emerald.withOpacity(0.6)),
+        border: Border.all(color: NexusColors.emerald, width: 1.2),
       ),
-      child: Column(children: children),
-    );
-  }
-
-  Widget _buildDropdownTile({
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required String value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: NexusColors.champagne),
-      title: Text(title, style: const TextStyle(color: NexusColors.ivory, fontSize: 13, fontWeight: FontWeight.w600)),
-      subtitle: Text(subtitle, style: const TextStyle(color: NexusColors.secondaryText, fontSize: 11)),
-      trailing: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          dropdownColor: NexusColors.deepForest,
-          style: const TextStyle(color: NexusColors.mintAccent, fontSize: 12, fontWeight: FontWeight.bold),
-          items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
-          onChanged: onChanged,
-        ),
-      ),
-    );
-  }
-
-  void _showLicenseDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: NexusColors.deepForest,
-        title: const Text('STOCKFISH ENGINE & LICENSING', style: TextStyle(color: NexusColors.champagne, fontSize: 15, fontWeight: FontWeight.bold)),
-        content: const SingleChildScrollView(
-          child: Text(
-            'CHESS NEXUS uses the Stockfish chess engine in compliance with the GNU General Public License v3 (GPLv3).\n\n'
-            'Stockfish is a free, powerful UCI chess engine developed by Tord Romstad, Marco Costalba, Joona Kiiski, Gary Linscott, and the Stockfish development team.\n\n'
-            'The engine source code and build instructions are fully available at https://github.com/official-stockfish/Stockfish in accordance with GPLv3 terms.',
-            style: TextStyle(color: NexusColors.ivory, fontSize: 12, height: 1.5),
-          ),
-        ),
-        actions: [
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: NexusColors.mintAccent, foregroundColor: NexusColors.obsidian),
-            child: const Text('UNDERSTOOD', style: TextStyle(fontWeight: FontWeight.bold)),
-            onPressed: () => Navigator.pop(ctx),
+      child: Column(
+        children: [
+          ListTile(
+            leading: Icon(
+              hasPerm ? Icons.mic : Icons.mic_off,
+              color: hasPerm ? NexusColors.mintAccent : Colors.redAccent,
+            ),
+            title: const Text('Microphone Permission', style: TextStyle(color: NexusColors.ivory, fontSize: 14)),
+            subtitle: Text(
+              hasPerm ? 'Active & Ready for Voice Moves' : 'Permission Required for Speech',
+              style: TextStyle(
+                color: hasPerm ? NexusColors.mintAccent : NexusColors.secondaryText,
+                fontSize: 12,
+              ),
+            ),
+            trailing: hasPerm
+                ? const Icon(Icons.check_circle, color: NexusColors.mintAccent, size: 20)
+                : ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: NexusColors.emerald,
+                      foregroundColor: NexusColors.ivory,
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    ),
+                    onPressed: () async {
+                      await _speech.initialize();
+                      setState(() {});
+                    },
+                    child: const Text('Grant', style: TextStyle(fontSize: 12)),
+                  ),
           ),
         ],
       ),
     );
   }
-}
 
+  Widget _buildAudioCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: NexusColors.deepForest,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: NexusColors.emerald, width: 1.2),
+      ),
+      child: Column(
+        children: [
+          SwitchListTile(
+            activeColor: NexusColors.mintAccent,
+            title: const Text('Sound Effects', style: TextStyle(color: NexusColors.ivory, fontSize: 14)),
+            subtitle: const Text('Play sound on moves, captures, and checks',
+                style: TextStyle(color: NexusColors.secondaryText, fontSize: 12)),
+            value: _soundEnabled,
+            onChanged: (val) {
+              setState(() {
+                _soundEnabled = val;
+                _audio.toggleSound(val);
+              });
+              if (val) _audio.playSound(ChessSound.moveSelf);
+            },
+          ),
+          const Divider(color: NexusColors.emerald, height: 1),
+          SwitchListTile(
+            activeColor: NexusColors.mintAccent,
+            title: const Text('Haptic Feedback', style: TextStyle(color: NexusColors.ivory, fontSize: 14)),
+            subtitle: const Text('Vibrate gently when pieces move or check occurs',
+                style: TextStyle(color: NexusColors.secondaryText, fontSize: 12)),
+            value: _hapticsEnabled,
+            onChanged: (val) {
+              setState(() => _hapticsEnabled = val);
+              if (val) HapticsService.vibrateOnMove();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppearanceCard() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: NexusColors.deepForest,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: NexusColors.emerald, width: 1.2),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Board Palette', style: TextStyle(color: NexusColors.ivory, fontSize: 14, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          DropdownButtonFormField<String>(
+            value: _boardTheme,
+            dropdownColor: NexusColors.deepForest,
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: NexusColors.emerald),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: NexusColors.emerald),
+              ),
+            ),
+            style: const TextStyle(color: NexusColors.ivory, fontSize: 13),
+            items: const [
+              DropdownMenuItem(value: "Obsidian & Emerald", child: Text("Obsidian & Emerald (Signature Dark)")),
+              DropdownMenuItem(value: "Deep Forest & Ivory", child: Text("Deep Forest & Ivory (Classic)")),
+            ],
+            onChanged: (val) {
+              if (val != null) setState(() => _boardTheme = val);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVoiceGuideCard() {
+    const examples = [
+      {'command': 'Move pawn to E4', 'desc': 'Standard pawn opening'},
+      {'command': 'Knight to F3', 'desc': 'Natural piece development'},
+      {'command': 'Bishop takes C4', 'desc': 'Tactical capture'},
+      {'command': 'Castle kingside', 'desc': 'Executes O-O castling'},
+      {'command': 'Castle queenside', 'desc': 'Executes O-O-O castling'},
+      {'command': 'Undo', 'desc': 'Reverts the previous turn'},
+      {'command': 'Restart game', 'desc': 'Starts a clean new board'},
+      {'command': 'What moves can I make?', 'desc': 'Announces and highlights all legal moves'},
+      {'command': 'Suggest a move', 'desc': 'Offers an AI tactical recommendation'},
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: NexusColors.deepForest,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: NexusColors.champagne, width: 1.2),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.mic, size: 16, color: NexusColors.champagne),
+              SizedBox(width: 8),
+              Text(
+                'Supported Voice Commands',
+                style: TextStyle(color: NexusColors.champagne, fontSize: 13, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ...examples.map((ex) => Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('• ', style: TextStyle(color: NexusColors.mintAccent, fontWeight: FontWeight.bold)),
+                    Expanded(
+                      child: RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '"${ex['command']}" — ',
+                              style: const TextStyle(
+                                color: NexusColors.ivory,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            TextSpan(
+                              text: ex['desc'],
+                              style: const TextStyle(
+                                color: NexusColors.secondaryText,
+                                fontSize: 11.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+}

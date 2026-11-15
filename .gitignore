@@ -28,3 +28,10 @@ local.properties
 *.keystore
 *.jks
 
+
+# Build artifacts
+*.apk
+*.aab
+*.ipa
+*.zip
+*.png
