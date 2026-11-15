@@ -427,14 +427,11 @@ class _BattleArenaScreenState extends State<BattleArenaScreen> with SingleTicker
   }
 
   Future<void> _showPromotionDialog(String from, String to) async {
-    final chosenPiece = await showDialog<String>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const PromotionDialog(),
-    );
+    final currentTurnColor = _game.turn == chess_lib.Color.WHITE ? PieceColor.white : PieceColor.black;
+    final chosenPiece = await PromotionDialog.show(context, currentTurnColor);
 
     if (chosenPiece != null) {
-      _executeMove(from, to, promotion: chosenPiece.toLowerCase());
+      _executeMove(from, to, promotion: chosenPiece.name[0].toLowerCase());
     }
   }
 
@@ -457,14 +454,15 @@ class _BattleArenaScreenState extends State<BattleArenaScreen> with SingleTicker
       }
 
       // Save to game history
+      final historySans = List<String>.from(_game.get_history());
       _history.saveGame(
         GameRecord(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           date: DateTime.now(),
           gameMode: _gameMode.label,
           result: resultStr,
-          movesCount: _game.history.length,
-          movesSan: List<String>.from(_game.history.map((m) => m.move.san ?? '')),
+          movesCount: historySans.length,
+          movesSan: historySans,
           pgn: _game.pgn(),
         ),
       );
@@ -662,9 +660,9 @@ class _BattleArenaScreenState extends State<BattleArenaScreen> with SingleTicker
             const SizedBox(height: 8),
 
             // 4. Move Ribbon (Historical notation)
-            MoveTapeRibbon(
-              movesSan: _game.history.map((m) => m.move.san ?? '').toList(),
-              currentMoveIndex: _game.history.length,
+            MoveTapeRibbonWidget(
+              movesSan: List<String>.from(_game.get_history()),
+              currentMoveIndex: _game.get_history().length - 1,
             ),
 
             const SizedBox(height: 8),
