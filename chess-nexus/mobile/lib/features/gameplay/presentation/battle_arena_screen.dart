@@ -54,6 +54,7 @@ class _BattleArenaScreenState extends State<BattleArenaScreen> with SingleTicker
   bool _isAiThinking = false;
   String _voiceFeedback = "Tap microphone to speak your move (e.g. 'Pawn to e4')";
   VoiceInteractionState _voiceState = VoiceInteractionState.idle;
+  final List<String> _movesSan = [];
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
@@ -338,9 +339,24 @@ class _BattleArenaScreenState extends State<BattleArenaScreen> with SingleTicker
     };
 
     final isCapture = _game.get(to) != null;
+
+    // Resolve Move SAN before executing
+    final verboseMoves = _game.moves({'verbose': true});
+    dynamic matchingMove;
+    for (final m in verboseMoves) {
+      if (m['from'] == from && m['to'] == to) {
+        if (promotion == null || m['promotion'] == promotion) {
+          matchingMove = m;
+          break;
+        }
+      }
+    }
+    final moveSan = matchingMove != null ? matchingMove['san'] as String : '$from$to';
+
     final executed = _game.move(moveParams);
 
-    if (executed != null) {
+    if (executed) {
+      _movesSan.add(moveSan);
       _lastMoveFrom = from;
       _lastMoveTo = to;
       _selectedSquare = null;
@@ -395,11 +411,15 @@ class _BattleArenaScreenState extends State<BattleArenaScreen> with SingleTicker
       final promo = aiMove['promotion'];
       final san = aiMove['san'];
 
-      _game.move({
+      final executed = _game.move({
         'from': from,
         'to': to,
         if (promo != null) 'promotion': promo,
       });
+
+      if (executed) {
+        _movesSan.add(san != null ? san as String : '$from$to');
+      }
 
       _lastMoveFrom = from;
       _lastMoveTo = to;
@@ -454,15 +474,14 @@ class _BattleArenaScreenState extends State<BattleArenaScreen> with SingleTicker
       }
 
       // Save to game history
-      final historySans = List<String>.from(_game.get_history());
       _history.saveGame(
         GameRecord(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           date: DateTime.now(),
           gameMode: _gameMode.label,
           result: resultStr,
-          movesCount: historySans.length,
-          movesSan: historySans,
+          movesCount: _movesSan.length,
+          movesSan: List<String>.from(_movesSan),
           pgn: _game.pgn(),
         ),
       );
@@ -520,7 +539,7 @@ class _BattleArenaScreenState extends State<BattleArenaScreen> with SingleTicker
   }
 
   void _handleUndo() {
-    if (_game.history.isEmpty) {
+    if (_movesSan.isEmpty) {
       setState(() {
         _voiceFeedback = "No moves to undo.";
       });
@@ -528,11 +547,14 @@ class _BattleArenaScreenState extends State<BattleArenaScreen> with SingleTicker
     }
 
     // In AI mode, undo both the AI's move and the user's move to return to user's turn
-    if (_gameMode != GameMode.twoPlayer && _game.history.length >= 2) {
+    if (_gameMode != GameMode.twoPlayer && _movesSan.length >= 2) {
       _game.undo();
       _game.undo();
+      if (_movesSan.isNotEmpty) _movesSan.removeLast();
+      if (_movesSan.isNotEmpty) _movesSan.removeLast();
     } else {
       _game.undo();
+      if (_movesSan.isNotEmpty) _movesSan.removeLast();
     }
 
     _lastMoveFrom = null;
@@ -547,6 +569,7 @@ class _BattleArenaScreenState extends State<BattleArenaScreen> with SingleTicker
   void _startNewGame() {
     setState(() {
       _game.reset();
+      _movesSan.clear();
       _selectedSquare = null;
       _legalDestinations = [];
       _lastMoveFrom = null;
@@ -661,8 +684,8 @@ class _BattleArenaScreenState extends State<BattleArenaScreen> with SingleTicker
 
             // 4. Move Ribbon (Historical notation)
             MoveTapeRibbonWidget(
-              movesSan: List<String>.from(_game.get_history()),
-              currentMoveIndex: _game.get_history().length - 1,
+              movesSan: List<String>.from(_movesSan),
+              currentMoveIndex: _movesSan.length - 1,
             ),
 
             const SizedBox(height: 8),
